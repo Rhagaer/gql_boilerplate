@@ -1,0 +1,53 @@
+{
+  "name": "boilerplate",
+  "version": "0.0.1",
+  "description": "Awesome project developed with TypeORM.",
+  "devDependencies": {
+    "@types/node": "^10.5.4",
+    "ts-node": "7.0.0",
+    "typescript": "3.0.1"
+  },
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.1",
+    "@types/jest": "^23.3.1",
+    "@types/yup": "^0.24.7",
+    "bcrypt": "^3.0.0",
+    "bcryptjs": "^2.4.3",
+    "gql2ts": "^1.8.1",
+    "graphql-import": "^0.6.0",
+    "graphql-request": "^1.8.0",
+    "graphql-tools": "^3.1.1",
+    "graphql-yoga": "^1.15.0",
+    "jest": "^23.4.2",
+    "mongodb": "^3.1.1",
+    "nodemon": "^1.18.3",
+    "reflect-metadata": "^0.1.12",
+    "start-server-and-test": "^1.7.0",
+    "ts-jest": "^23.0.1",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.14.0",
+    "typeorm": "0.2.7",
+    "yup": "^0.26.0"
+  },
+  "scripts": {
+    "start": "export NODE_ENV=development && docker start database && nodemon --exec ts-node src/index.ts",
+    "gen-scheme-types": "gql2ts src/schema.graphql -o src/types/schema.d.ts",
+    "test": "export NODE_ENV=test docker start boilerplate_test && jest --forceExit"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "verbose": true,
+    "testURL": "http://localhost/"
+  }
+}
