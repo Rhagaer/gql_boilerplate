@@ -1,7 +1,7 @@
 import { request } from "graphql-request";
 import { startServer } from "../../startServer";
 import { User } from "../../entity/User";
-import { duplicateEmail, emailNotLongEnough } from "./errorMessage";
+import { duplicateEmail } from "./errorMessage";
 
 let getHost = () => "";
 
@@ -21,34 +21,40 @@ beforeAll(async () => {
   getHost = () => `http://127.0.0.1:${port}`;
 });
 
-test("Register User", async () => {
+describe("Register User", async () => {
   const email = "bab@gmail.com";
   const password = "123456";
 
-  //make sure registration works
-  const response = await request(getHost(), mutatuon(email, password));
-  expect(response).toEqual({ register: null });
-  const users = await User.find({ where: { email } });
-  expect(users).toHaveLength(1);
-  const user = users[0];
-  expect(user.email).toEqual(email);
-  expect(user.password).not.toEqual(password);
+  it("Register User", async () => {
+    //make sure registration works
+    const response = await request(getHost(), mutatuon(email, password));
+    expect(response).toEqual({ register: null });
+    const users = await User.find({ where: { email } });
+    expect(users).toHaveLength(1);
+    const user = users[0];
+    expect(user.email).toEqual(email);
+    expect(user.password).not.toEqual(password);
+  });
 
-  // test for duplicate emails
-  const response2: any = await request(getHost(), mutatuon(email, password));
-  expect(response2.register).toHaveLength(1);
-  expect(response2.register[0]).toEqual({
-    path: "email",
-    message: duplicateEmail
+  it("Test Duplicate Emails", async () => {
+    const response2: any = await request(getHost(), mutatuon(email, password));
+    expect(response2.register).toHaveLength(1);
+    expect(response2.register[0]).toEqual({
+      path: "email",
+      message: duplicateEmail
+    });
   });
 
   //test for bad email
-  const response3: any = await request(
-    getHost(),
-    mutatuon("bademail", password)
-  );
-  expect(response3.register).toHaveLength(1);
-  expect(response3.register[0].path).toEqual("email");
+  it("Test For  A Bad Email", async () => {
+    const response3: any = await request(
+      getHost(),
+      mutatuon("bademail", password)
+    );
+    expect(response3.register).toHaveLength(1);
+    expect(response3.register[0].path).toEqual("email");
+  });
+  
 });
 
 // use a test database

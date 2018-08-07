@@ -10,6 +10,9 @@ export class User extends BaseEntity {
 
   @Column("text") password!: string;
 
+  @Column("boolean", { default: false })
+  confirmed: boolean = false;
+
   //Executes right before the object is added
   // @BeforeInsert()
   // addId(){

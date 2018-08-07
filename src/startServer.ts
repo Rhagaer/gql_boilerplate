@@ -5,10 +5,12 @@ import * as fs from "fs";
 import { createTypeormConnection } from "./utils/createTypeormConnections";
 import { mergeSchemas, makeExecutableSchema } from "graphql-tools";
 import { GraphQLSchema } from "graphql";
+import Redis = require("ioredis");
+import { User } from "./entity/User";
 
 export const startServer = async () => {
   const schemas: GraphQLSchema[] = [];
-  
+
   const folders = fs.readdirSync(path.join(__dirname, "./modules"));
 
   folders.forEach(folder => {
@@ -19,7 +21,27 @@ export const startServer = async () => {
     schemas.push(makeExecutableSchema({ resolvers, typeDefs }));
   });
 
-  const server = new GraphQLServer({ schema: mergeSchemas({ schemas }) });
+  const redis = new Redis();
+
+  const server = new GraphQLServer({
+    schema: mergeSchemas({ schemas }),
+    context: ({ request }) => ({
+      redis,
+      // ** This gets the url of the server and passes it into context
+      url: request.protocol + "://" + request.get("host")
+    })
+  });
+
+  server.express.get("/confirm/:id", async (req, res) => {
+    const { id } = req.params;
+    const userId = await redis.get(id);
+    if (!userId) {
+      res.send("Inavlid");
+      return;
+    }
+    User.update({ id: userId }, { confirmed: true });
+    res.send("Okay");
+  });
 
   await createTypeormConnection();
   const app = await server.start({
